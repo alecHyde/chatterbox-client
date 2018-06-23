@@ -96,14 +96,13 @@ describe('chatterbox', function() {
         };
 
         app.renderMessage(message);
-
         expect($('#chats').children().length).to.equal(1);
       });
 
       it('should be able to add rooms to the DOM', function() {
         app.renderRoom('superLobby');
-
-        expect($('#roomSelect').children().length).to.equal(1);
+        console.log()
+        expect($('#roomSelect').children().length).to.equal(2);
       });
 
     });

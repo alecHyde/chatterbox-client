@@ -11,6 +11,7 @@ class App {
   constructor() {
     this.server = 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages/';
     this.friends = [];
+    this.roomList = ['lobby'];
     this.refer = this;
     this.message = {
       username: window.location.search.split('=')[window.location.search.split('=').length - 1],
@@ -18,7 +19,7 @@ class App {
       createdAt: undefined,
       updatedAt: undefined,
       text: undefined,
-      roomname: 'lobby'
+      roomname: this.roomList[0]
     };
   }
   
@@ -66,12 +67,13 @@ class App {
       // This is the url you should use to communicate with the parse API server.
       url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages/',
       type: 'GET',
-      data: {order: '-createdAt', limit: 200},
+      data: {order: '-createdAt', limit: 100},
       dataType: 'json',
       contentType: 'application/json',
       success: (data) => {
         console.log(data.results);
         this.filterPost(data.results, 'lobby');
+        this.renderSelectRoomOptions();
         this.init();
       },
       error: (data) => {
@@ -88,14 +90,29 @@ class App {
   }
   
   renderRoom(room) {
-    if (!$('#roomSelect')) {
+    if ($('#chats').children().length === 0) {
       var rooms = document.createElement('div');
       rooms.id = 'roomSelect';
       $('#chats').append(rooms);
+      console.log($('#roomSelect'));
     }
-    var newRoom = document.createElement('div');
-    newRoom.id = room;
-    $('#roomSelect').append(newRoom);
+    console.log(this.roomList);
+    if (this.roomList.indexOf(room) === -1) {
+      var newRoom = document.createElement('div');
+      newRoom.id = room;
+      console.log(room);
+      this.roomList.push(room);
+      $('#roomSelect').append(newRoom);
+    }
+  }
+  
+  renderSelectRoomOptions() {
+    for (var i = 0; i < this.roomList.length; i++) {
+      var option = document.createElement('option');
+      option.id = this.roomList[i] + 'Option';
+      option.append(this.roomList[i]);
+      $('#roomList').append(option);
+    }
   }
   
   clearMessages() {
@@ -200,6 +217,8 @@ class App {
     var username = escapedObj.username;
     var room = escapedObj.roomname;
     var friendBool = this.isFriend(username);
+    
+    this.renderRoom(room);
     
     if (currentRoomOnPage === 'lobby' || room === currentRoomOnPage) {
       var node = document.createElement("div");

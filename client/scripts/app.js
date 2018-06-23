@@ -13,7 +13,7 @@ class App {
     this.friends = [];
     this.refer = this;
     this.message = {
-      username: window.location.search,
+      username: window.location.search.split('=')[window.location.search.split('=').length - 1],
       objectId: undefined,
       createdAt: undefined,
       updatedAt: undefined,
@@ -30,12 +30,10 @@ class App {
         thisApp.refresh();
       });
       
-      $('#submitButton').on('click', function(event) {
-        debugger;
-        thisApp.message.text = $('#inputArea').val();
-        thisApp.send(thisApp.message);
-        event.preventDefault();
-      });
+      thisApp.handleSubmit();
+      
+      thisApp.handleUsernameClick();
+      
     })
     
   }
@@ -74,6 +72,7 @@ class App {
       success: (data) => {
         console.log(data.results);
         this.filterPost(data.results, 'lobby');
+        this.init();
       },
       error: (data) => {
         // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -83,27 +82,49 @@ class App {
     
   }
   
-  renderMessage() {
-    
+  renderMessage(message, currentRoomOnPage) {
+    currentRoomOnPage = currentRoomOnPage || 'lobby'
+    this.composeMessage(this.translatePost(message), currentRoomOnPage)
   }
   
-  renderRoom() {
-    
+  renderRoom(room) {
+    if (!$('#roomSelect')) {
+      var rooms = document.createElement('div');
+      rooms.id = 'roomSelect';
+      $('#chats').append(rooms);
+    }
+    var newRoom = document.createElement('div');
+    newRoom.id = room;
+    $('#roomSelect').append(newRoom);
   }
   
   clearMessages() {
-    
+    $('#chats').empty();
   }
   
   handleUsernameClick() {
-    
+    var thisApp = this;
+    return $('a').on('click', function(event) {
+      if (thisApp.friends.indexOf($(this).data('username')) <= -1) {
+        thisApp.friends.push($(this).data('username'));
+        console.log(thisApp.friends); 
+      }
+    });
   }
   
   handleSubmit() {
+    var thisApp = this;
+    return $('#submitButton').on('click', function(event) {
+      thisApp.message.text = $('#inputArea').val();
+      thisApp.send(thisApp.message);
+      thisApp.refresh();
+      event.preventDefault();
+    });
     
   }
   
   refresh() {
+    this.clearMessages();
     this.fetch();
     // $.ajax({
     //   // This is the url you should use to communicate with the parse API server.
@@ -177,7 +198,7 @@ class App {
       // add message to div as p
       var paragraph = document.createElement('p');
       // add username to div as h5
-      var usernameHeader = document.createElement('h3');
+      var usernameHeader = document.createElement('a');
       
       if (friendBool) {
         // make message bold using an additional class
@@ -187,6 +208,10 @@ class App {
       node.append(paragraph);
       usernameHeader.prepend(username);
       usernameHeader.append(': ');
+      $(usernameHeader).attr("href", "#");
+      $(usernameHeader).data('username', username);
+      usernameHeader.className += username;
+      usernameHeader.className += ' usernameHeader';
       node.prepend(usernameHeader);
       // add the node to the chats div
       $('#chats').append(node);

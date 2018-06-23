@@ -94,3 +94,7 @@ form input[type=text] {
     margin: 5px;
 }
 
+.boldFriends {
+    font-weight: bold;
+}
+

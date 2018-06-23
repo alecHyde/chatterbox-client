@@ -107,7 +107,12 @@ class App {
     return $('a').on('click', function(event) {
       if (thisApp.friends.indexOf($(this).data('username')) <= -1) {
         thisApp.friends.push($(this).data('username'));
-        console.log(thisApp.friends); 
+      }
+      var div = $('#chats').children();
+      for (var i = 0; i < div.length; i++) {
+        if ($(div[i]).children()[0].className.includes($(this).data('username'))) {
+          $($(div[i]).children()[1]).addClass(' boldFriends');
+        }
       }
     });
   }
@@ -145,7 +150,11 @@ class App {
   }
   
   escapeString(str) {
-    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    if (str != undefined) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    } else {
+      return 'Don\'t give me null value you sucker';
+    }
   };
   
   isFriend(name) {

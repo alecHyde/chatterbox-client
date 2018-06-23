@@ -26,7 +26,20 @@
     <div id="main">
       <h1>chatterbox</h1>
       <!-- Your HTML goes here! -->
-    </div>
+      <div id="roomSection">
+        <span>Room: </span>
+        <select>
+          <option value="lobby">Lobby</option>
+          <option value="hrsf98">HRSF-98</option>
+        </select>
+      </div>
+      <div id ="inputSection">
+        <form>
+          <input type="text" name="inputArea" id="inputArea" placeholder="Enter your message here!">
+          <button id="submitButton">Submit</button>
+        </form>
+      </div>
+      <button id="refreshButton">refresh</button>
     <div id="chats"></div>
   </body>
 </html>

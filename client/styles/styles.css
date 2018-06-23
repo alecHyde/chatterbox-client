@@ -88,3 +88,9 @@ form input[type=text] {
     background-color: #0090da;
 }
 
+.node {
+    background-color: #e6f7ff;
+    border: 1px black solid;
+    margin: 5px;
+}
+

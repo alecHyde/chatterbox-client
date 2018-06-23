@@ -1,126 +1,175 @@
 // YOUR CODE HERE:
-var message = {
-  objectId: undefined,
-  username: 'shawndrost',
-  createdAt: undefined,
-  updatedAt: undefined,
-  text: 'trololo',
-  roomname: '4chan'
-};
 
-var escapeString = function(str) {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;');
-};
+// app function - class... store fetching and posting functionality. makes a new object every time a fetch or get is called
 
-// make a click event that adds username to array when that username is clicked
-var friends = [ ];
+// init - method on the app class that fetches the data
 
-$(document).ready(function() {
+// app behavior - should send, fetch, control chatroom behavior, and respond to events (add freinds and send messages)
+
+
+class App {
+  constructor() {
+    this.server = 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages/';
+    this.friends = [];
+    this.refer = this;
+    this.message = {
+      username: window.location.search,
+      objectId: undefined,
+      createdAt: undefined,
+      updatedAt: undefined,
+      text: undefined,
+      roomname: 'lobby'
+    };
+  }
   
-  var fetchData = function() {
-    objectKeys = {order: '-createdAt', limit: 200};
-    $.get('http://parse.sfm6.hackreactor.com/chatterbox/classes/messages/', objectKeys,
-      function(data) {
-        console.log(data.results);
-        filterPost(data.results, 'lobby', originalLength);
+  init() {
+    var thisApp = this;
+    $(document).ready(function() {
+      $('#refreshButton').on('click', () => {
+        console.log(thisApp);
+        thisApp.refresh();
       });
-  };
+      
+      $('#submitButton').on('click', function(event) {
+        debugger;
+        thisApp.message.text = $('#inputArea').val();
+        thisApp.send(thisApp.message);
+        event.preventDefault();
+      });
+    })
+    
+  }
   
+  send(message) {
+    this.message = message;
+    $.ajax({
+      // This is the url you should use to communicate with the parse API server.
+      url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
+      type: 'POST',
+      data: JSON.stringify(this.message),
+      contentType: 'application/json',
+      success: function (data) {
+        console.log('chatterbox: Message sent');
+      },
+      error: function (data) {
+        // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
+        console.error('chatterbox: Failed to send message', data);
+      }
+    });
+  }
   
-  var originalLength = 0;
-  // $.ajax({
-  //   // This is the url you should use to communicate with the parse API server.
-  //   url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
-  //   type: 'GET',
-  //   dataType: 'json',
-  //   contentType: 'application/json',
-  //   success: function (data) {
-  //     console.log(data.results);
-  //     filterPost(data.results, 'lobby', originalLength);
-  //     originalLength = data.results.length;
-  //   },
-  //   error: function (data) {
-  //     // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
-  //     console.error('chatterbox: Failed to request message', data);
-  //   }
-  // });
-  // display message received from the parse server
-  //// ajax request
-  ////// pass the data to the helper function which will append the data to the dom
-  //// create rooms?
-  ////// filter data and decide if it should be displayed at the current chat board
-  //// button to refresh and run ajax request
-  ////// or setInterval to automatically run the ajax request to update the dom if new data is available
-  
-  // trigger when page is first loaded or when user press refresh button
-  //// make new object with all text for each component filtered through the escapeString helper function.  
-  //// use information to make message object (with some info from the object, but not all info) and prepend to the chat div
-  $('#refreshButton').on('click', function() {
+  fetch() {
+    // $.get('http://parse.sfm6.hackreactor.com/chatterbox/classes/messages/', objectKeys,
+    //   function(data) {
+    //     console.log(data.results);
+    //     filterPost(data.results, 'lobby', originalLength);
+    //   });
     $.ajax({
       // This is the url you should use to communicate with the parse API server.
       url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages/',
       type: 'GET',
+      data: {order: '-createdAt', limit: 200},
       dataType: 'json',
       contentType: 'application/json',
-      success: function (data) {
+      success: (data) => {
         console.log(data.results);
-        filterPost(data.results, 'lobby', originalLength);
-        originalLength = data.results.length;
+        this.filterPost(data.results, 'lobby');
       },
-      error: function (data) {
+      error: (data) => {
         // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
         console.error('chatterbox: Failed to request message', data);
       }
     });
-  });
+    
+  }
   
+  renderMessage() {
+    
+  }
   
-  var isFriend = function(name) {
+  renderRoom() {
+    
+  }
+  
+  clearMessages() {
+    
+  }
+  
+  handleUsernameClick() {
+    
+  }
+  
+  handleSubmit() {
+    
+  }
+  
+  refresh() {
+    this.fetch();
+    // $.ajax({
+    //   // This is the url you should use to communicate with the parse API server.
+    //   url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages/',
+    //   type: 'GET',
+    //   dataType: 'json',
+    //   contentType: 'application/json',
+    //   success: function (data) {
+    //     console.log(data.results);
+    //     filterPost(data.results, 'lobby', originalLength);
+    //     originalLength = data.results.length;
+    //   },
+    //   error: function (data) {
+    //     // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
+    //     console.error('chatterbox: Failed to request message', data);
+    //   }
+    // });
+  }
+  
+  escapeString(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  };
+  
+  isFriend(name) {
     // returns a boolean
-    if (friends.indexOf(name) === -1) {
+    if (this.friends.indexOf(name) === -1) {
       return false;
     } else {
       return true;
     }
-  };
+  }
   
   
-  var filterPost = function(dataArray, room, originalLength) {
-    
+  filterPost(dataArray, room) {
     // iterate over the data array
     var safeDataArray = [];
-    for (var i = originalLength; i < dataArray.length; i++) {
-      var safeObj = translatePost(dataArray[i]);
+    for (var i = 0; i < dataArray.length; i++) {
+      var safeObj = this.translatePost(dataArray[i]);
       safeDataArray.push(safeObj);
     }
-    
     for (var j = 0; j < safeDataArray.length; j++) {
-      composeMessage(safeDataArray[j], room);
+      this.composeMessage(safeDataArray[j], room);
     }  
     //// create a new object for each item in the array
     //// pass information to the new object through the escape string function
     //// decide which room collection array the message should be sent to
-    
     // get from another helper function  
     // use new object to create the messages
-  };
+  }
   
-  var translatePost = function(untranslatedObj) {
+  translatePost(untranslatedObj) {
     var newObj = {};
     for (var key in untranslatedObj) {
-      newObj[key] = escapeString(untranslatedObj[key]);
+      newObj[key] = this.escapeString(untranslatedObj[key]);
     }
     return newObj;
-  };
+  }
   
-  var composeMessage = function(escapedObj, currentRoomOnPage) {
+  composeMessage(escapedObj, currentRoomOnPage) {
     // use key value pairs from object to create a message for the feed
     // include message, time created (decide if necessary later), username
     // push the message to the site
     var message = escapedObj.text;
     var username = escapedObj.username;
     var room = escapedObj.roomname;
-    var friendBool = isFriend(username);
+    var friendBool = this.isFriend(username);
     
     if (currentRoomOnPage === 'lobby' || room === currentRoomOnPage) {
       var node = document.createElement("div");
@@ -140,21 +189,174 @@ $(document).ready(function() {
       usernameHeader.append(': ');
       node.prepend(usernameHeader);
       // add the node to the chats div
-      $('#chats').prepend(node);
+      $('#chats').append(node);
     } 
-  };
+  }
+}
+
+var app = new App();
+
+// var message = {
+//   objectId: undefined,
+//   username: 'shawndrost',
+//   createdAt: undefined,
+//   updatedAt: undefined,
+//   text: 'trololo',
+//   roomname: '4chan'
+// };
+
+// var escapeString = function(str) {
+//   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+// };
+
+// // make a click event that adds username to array when that username is clicked
+// var friends = [ ];
+
+app.init();
+app.fetch();
+
+// $(document).ready(function() {
+  
+//   var fetchData = function() {
+//     objectKeys = {order: '-createdAt', limit: 200};
+//     // $.get('http://parse.sfm6.hackreactor.com/chatterbox/classes/messages/', objectKeys,
+//     //   function(data) {
+//     //     console.log(data.results);
+//     //     filterPost(data.results, 'lobby', originalLength);
+//     //   });
+//   };
+  
+  
+//   var originalLength = 0;
+//   // $.ajax({
+//   //   // This is the url you should use to communicate with the parse API server.
+//   //   url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
+//   //   type: 'GET',
+//   //   dataType: 'json',
+//   //   contentType: 'application/json',
+//   //   success: function (data) {
+//   //     console.log(data.results);
+//   //     filterPost(data.results, 'lobby', originalLength);
+//   //     originalLength = data.results.length;
+//   //   },
+//   //   error: function (data) {
+//   //     // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
+//   //     console.error('chatterbox: Failed to request message', data);
+//   //   }
+//   // });
+//   // display message received from the parse server
+//   //// ajax request
+//   ////// pass the data to the helper function which will append the data to the dom
+//   //// create rooms?
+//   ////// filter data and decide if it should be displayed at the current chat board
+//   //// button to refresh and run ajax request
+//   ////// or setInterval to automatically run the ajax request to update the dom if new data is available
+  
+//   // trigger when page is first loaded or when user press refresh button
+//   //// make new object with all text for each component filtered through the escapeString helper function.  
+//   //// use information to make message object (with some info from the object, but not all info) and prepend to the chat div
+//   $('#refreshButton').on('click', function() {
+    
+    
+//     $.ajax({
+//       // This is the url you should use to communicate with the parse API server.
+//       url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages/',
+//       type: 'GET',
+//       dataType: 'json',
+//       contentType: 'application/json',
+//       success: function (data) {
+//         console.log(data.results);
+//         filterPost(data.results, 'lobby', originalLength);
+//         originalLength = data.results.length;
+//       },
+//       error: function (data) {
+//         // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
+//         console.error('chatterbox: Failed to request message', data);
+//       }
+//     });
+//   });
+  
+  
+  // var isFriend = function(name) {
+  //   // returns a boolean
+  //   if (friends.indexOf(name) === -1) {
+  //     return false;
+  //   } else {
+  //     return true;
+  //   }
+  // };
+  
+  
+  // var filterPost = function(dataArray, room, originalLength) {
+    
+  //   // iterate over the data array
+  //   var safeDataArray = [];
+  //   for (var i = originalLength; i < dataArray.length; i++) {
+  //     var safeObj = translatePost(dataArray[i]);
+  //     safeDataArray.push(safeObj);
+  //   }
+    
+  //   for (var j = 0; j < safeDataArray.length; j++) {
+  //     composeMessage(safeDataArray[j], room);
+  //   }  
+  //   //// create a new object for each item in the array
+  //   //// pass information to the new object through the escape string function
+  //   //// decide which room collection array the message should be sent to
+    
+  //   // get from another helper function  
+  //   // use new object to create the messages
+  // };
+  
+  // var translatePost = function(untranslatedObj) {
+  //   var newObj = {};
+  //   for (var key in untranslatedObj) {
+  //     newObj[key] = escapeString(untranslatedObj[key]);
+  //   }
+  //   return newObj;
+  // };
+  
+  // var composeMessage = function(escapedObj, currentRoomOnPage) {
+  //   // use key value pairs from object to create a message for the feed
+  //   // include message, time created (decide if necessary later), username
+  //   // push the message to the site
+  //   var message = escapedObj.text;
+  //   var username = escapedObj.username;
+  //   var room = escapedObj.roomname;
+  //   var friendBool = isFriend(username);
+    
+  //   if (currentRoomOnPage === 'lobby' || room === currentRoomOnPage) {
+  //     var node = document.createElement("div");
+  //     node.className += 'node';
+  //     // add message to div as p
+  //     var paragraph = document.createElement('p');
+  //     // add username to div as h5
+  //     var usernameHeader = document.createElement('h3');
+      
+  //     if (friendBool) {
+  //       // make message bold using an additional class
+  //       paragraph.className += 'boldFriends';
+  //     }
+  //     paragraph.append(message);
+  //     node.append(paragraph);
+  //     usernameHeader.prepend(username);
+  //     usernameHeader.append(': ');
+  //     node.prepend(usernameHeader);
+  //     // add the node to the chats div
+  //     $('#chats').prepend(node);
+  //   } 
+  // };
   
   
         
         
-  // post messages to the server
-  //// submit button is pressed
-  ////// if text box has input
-  //////// post
-  $('#submitButton').on('click', function(event) {
-    console.log($('#inputArea').val());
-    event.preventDefault();
-  });
+//   // post messages to the server
+//   //// submit button is pressed
+//   ////// if text box has input
+//   //////// post
+//   $('#submitButton').on('click', function(event) {
+//     console.log($('#inputArea').val());
+//     event.preventDefault();
+//   });
   
   
   
@@ -162,9 +364,9 @@ $(document).ready(function() {
   
   
   
-  fetchData();
+//   fetchData();
   
-  // when the message is typed into the text box and submit button is pressed.
+//   // when the message is typed into the text box and submit button is pressed.
   // $.ajax({
   //   // This is the url you should use to communicate with the parse API server.
   //   url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
@@ -179,19 +381,19 @@ $(document).ready(function() {
   //     console.error('chatterbox: Failed to send message', data);
   //   }
   // });
-  // // setInterval or refresh button
-  // $.ajax({
-  //   // This is the url you should use to communicate with the parse API server.
-  //   url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
-  //   type: 'GET',
-  //   dataType: 'json',
-  //   contentType: 'application/json',
-  //   success: function (data) {
-  //     console.log(data);
-  //   },
-  //   error: function (data) {
-  //     // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
-  //     console.error('chatterbox: Failed to request message', data);
-  //   }
-  // });
-});
+//   // // setInterval or refresh button
+//   // $.ajax({
+//   //   // This is the url you should use to communicate with the parse API server.
+//   //   url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
+//   //   type: 'GET',
+//   //   dataType: 'json',
+//   //   contentType: 'application/json',
+//   //   success: function (data) {
+//   //     console.log(data);
+//   //   },
+//   //   error: function (data) {
+//   //     // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
+//   //     console.error('chatterbox: Failed to request message', data);
+//   //   }
+//   // });
+// });
